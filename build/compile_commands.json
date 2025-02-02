@@ -1,0 +1,27 @@
+[
+{
+  "directory": "/home/puluboi/ecosystem_sim/build",
+  "command": "/usr/bin/c++  -isystem /home/linuxbrew/.linuxbrew/include -g -o CMakeFiles/exe.dir/src/main.cpp.o -c /home/puluboi/ecosystem_sim/src/main.cpp",
+  "file": "/home/puluboi/ecosystem_sim/src/main.cpp"
+},
+{
+  "directory": "/home/puluboi/ecosystem_sim/build",
+  "command": "/usr/bin/c++  -isystem /home/linuxbrew/.linuxbrew/include -g -o CMakeFiles/exe.dir/src/game.cpp.o -c /home/puluboi/ecosystem_sim/src/game.cpp",
+  "file": "/home/puluboi/ecosystem_sim/src/game.cpp"
+},
+{
+  "directory": "/home/puluboi/ecosystem_sim/build",
+  "command": "/usr/bin/c++  -isystem /home/linuxbrew/.linuxbrew/include -g -o CMakeFiles/exe.dir/src/entity.cpp.o -c /home/puluboi/ecosystem_sim/src/entity.cpp",
+  "file": "/home/puluboi/ecosystem_sim/src/entity.cpp"
+},
+{
+  "directory": "/home/puluboi/ecosystem_sim/build",
+  "command": "/usr/bin/c++  -isystem /home/linuxbrew/.linuxbrew/include -g -o CMakeFiles/exe.dir/src/obstacle.cpp.o -c /home/puluboi/ecosystem_sim/src/obstacle.cpp",
+  "file": "/home/puluboi/ecosystem_sim/src/obstacle.cpp"
+},
+{
+  "directory": "/home/puluboi/ecosystem_sim/build",
+  "command": "/usr/bin/c++  -isystem /home/linuxbrew/.linuxbrew/include -g -o CMakeFiles/exe.dir/src/graphics/Viz.cpp.o -c /home/puluboi/ecosystem_sim/src/graphics/Viz.cpp",
+  "file": "/home/puluboi/ecosystem_sim/src/graphics/Viz.cpp"
+}
+]
