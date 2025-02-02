@@ -1,0 +1,3 @@
+/home/puluboi/ecosystem_sim/build/CMakeFiles/exe.dir
+/home/puluboi/ecosystem_sim/build/CMakeFiles/edit_cache.dir
+/home/puluboi/ecosystem_sim/build/CMakeFiles/rebuild_cache.dir
