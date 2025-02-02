@@ -22,7 +22,7 @@ Entity::Entity(std::shared_ptr<sf::RectangleShape> shape_, Game& game_,
   if (!shape) {
     throw std::runtime_error("Shape is not initialized");
   }
-  getRandomPos();
+  getRandomPos(wanderRange);
 }
 
 bool Entity::collisionCheck() {
@@ -64,7 +64,7 @@ void Entity::Update() {
   }
   if (checkIfIdle()) {
     currentSpeed *= agility;
-    getRandomPos();
+    getRandomPos(wanderRange);
   }
 
   handleEntities();
@@ -72,19 +72,21 @@ void Entity::Update() {
     calcNextPos(destination);
     lastpos = shape->getPosition();
     if (collisionCheck()) {
+        getRandomPos(wanderRange*0.2);
       std::cout << " collision" << std::endl;
     }
     shape->setPosition(nextpos);
   }
   else{
-    getRandomPos();
+    getRandomPos(wanderRange);
   }
 }
 
 bool Entity::checkIfIdle() {
-  sf::Vector2f currentPos = shape->getPosition();
-  return abs(destination.x - currentPos.x) < 0.5 &&
-         abs(destination.y - currentPos.y) < 0.5;
+sf::Vector2f currentPos = shape->getPosition();
+float distance = std::sqrt(std::pow(destination.x - currentPos.x, 2) +
+                                                     std::pow(destination.y - currentPos.y, 2));
+return distance < 0.5;
 }
 
 void Entity::setWanderRange(int range_) { wanderRange = range_; }
@@ -95,7 +97,7 @@ void Entity::setAcceleration(float acceleration_) {
   acceleration = acceleration_;
 }
 
-void Entity::getRandomPos() {
+void Entity::getRandomPos(int range) {
   sf::Vector2f currentPos = shape->getPosition();
   float randomX =
       currentPos.x +
@@ -107,18 +109,13 @@ void Entity::getRandomPos() {
       wanderRange;
 
   auto dest = sf::Vector2f(randomX, randomY);
-  if (!isObstacleBetween(dest)) {
-    destination = dest;
-  } else {
-    destination = lastpos;
-  }
+  destination = dest;
 }
 
 bool Entity::isAlive() { return alive; }
 
 void Entity::handleEntities() {
   sf::Vector2f currentPos = shape->getPosition();
-  sf::Vector2f moveAway(0.0f, 0.0f);
   bool tooClose = false;
   float nearestDistance = aggroDistance;
 
@@ -134,23 +131,25 @@ void Entity::handleEntities() {
         destination = otherPos;
         if (distance < damageDistance) {
           if (entity->getDamaged(damage)) {  // if the target dies
-            getRandomPos();
+            getRandomPos(wanderRange);
           }
         }
       }
 
-      if (!chase && distance < minDistance && entity->isAlive()) {
+      if (!chase && distance < minDistance && entity->chase && entity->isAlive()) {
         tooClose = true;
-        moveAway += diff / distance;  // Normalize and add to moveAway vector
+        sf::Vector2f unitVector = diff / distance;
+        sf::Vector2f dest = currentPos + unitVector * 30.f;
+        if(isObstacleBetween(dest)){
+            dest = sf::Vector2f(dest.x + static_cast<float>(rand() % 20 - 10), dest.y + static_cast<float>(rand() % 20 - 10));
+        }
+        else{
+            destination = dest;
+        }
       }
     }
   }
 
-  if (!chase && tooClose) {
-    moveAway /=
-        static_cast<float>(game.getEntities().size() - 1);  // Average direction
-    destination = currentPos + moveAway * minDistance;
-  }
 }
 
 bool Entity::getDamaged(unsigned int damage_) {

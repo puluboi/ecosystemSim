@@ -27,7 +27,7 @@ class Entity {
 
   void setAcceleration(float acceleration_);
   
-  void getRandomPos();
+  void getRandomPos(int range);
 
   void avoidCloseEntities();
   bool isAlive();
