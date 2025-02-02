@@ -162,7 +162,7 @@ bool Entity::getDamaged(unsigned int damage_) {
   }
   return false;
 }
-
+// Calc the next position
 void Entity::calcNextPos(sf::Vector2f destinaton) {
   sf::Vector2f currentPos = shape->getPosition();
   sf::Vector2f direction = destinaton - currentPos;
