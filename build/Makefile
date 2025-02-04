@@ -225,6 +225,30 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/exe.dir/build.make CMakeFiles/exe.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/nutrient.o: src/nutrient.cpp.o
+.PHONY : src/nutrient.o
+
+# target to build an object file
+src/nutrient.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exe.dir/build.make CMakeFiles/exe.dir/src/nutrient.cpp.o
+.PHONY : src/nutrient.cpp.o
+
+src/nutrient.i: src/nutrient.cpp.i
+.PHONY : src/nutrient.i
+
+# target to preprocess a source file
+src/nutrient.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exe.dir/build.make CMakeFiles/exe.dir/src/nutrient.cpp.i
+.PHONY : src/nutrient.cpp.i
+
+src/nutrient.s: src/nutrient.cpp.s
+.PHONY : src/nutrient.s
+
+# target to generate assembly for a file
+src/nutrient.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exe.dir/build.make CMakeFiles/exe.dir/src/nutrient.cpp.s
+.PHONY : src/nutrient.cpp.s
+
 src/obstacle.o: src/obstacle.cpp.o
 .PHONY : src/obstacle.o
 
@@ -270,6 +294,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/nutrient.o"
+	@echo "... src/nutrient.i"
+	@echo "... src/nutrient.s"
 	@echo "... src/obstacle.o"
 	@echo "... src/obstacle.i"
 	@echo "... src/obstacle.s"

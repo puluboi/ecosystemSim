@@ -297,7 +297,8 @@ CMakeFiles/exe.dir/src/entity.cpp.o: \
  /home/puluboi/ecosystem_sim/src/game.hpp /usr/include/memory.h \
  /usr/include/string.h /usr/include/strings.h \
  /home/puluboi/ecosystem_sim/src/graphics/Viz.hpp \
- /home/puluboi/ecosystem_sim/src/obstacle.hpp /usr/include/c++/11/random \
+ /home/puluboi/ecosystem_sim/src/obstacle.hpp \
+ /home/puluboi/ecosystem_sim/src/nutrient.hpp /usr/include/c++/11/random \
  /usr/include/c++/11/bits/random.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/opt_random.h \
  /usr/include/c++/11/bits/random.tcc /usr/include/c++/11/numeric \

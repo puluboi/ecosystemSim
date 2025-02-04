@@ -5,12 +5,18 @@
 #include <vector>
 #include "obstacle.hpp"
 #include "entity.hpp"
+#include "nutrient.hpp"
 #include <random>
+#include <iostream>
 class Game {
  public:
   void Update();
   bool addObstacle(sf::Vector2f pos, sf::Vector2f size, sf::Color color);
+  void removeEntity(unsigned int id);
   bool addEntity(sf::Vector2f pos, sf::Vector2f size, sf::Color color);
+  bool addNutrient(sf::Vector2f pos, unsigned int id);
+  void removeNutrient(Nutrient nutrient);
+  float getDeltaTime();
   bool isRunning();
   bool initGame();
   std::vector<std::unique_ptr<Obstacle>>& getObstacles();
@@ -25,7 +31,10 @@ class Game {
   void updateEntities();
 
  private:
+ Viz viz;
+sf::Clock clock;
   std::vector<std::unique_ptr<Entity>> entities;
-  Viz viz;
   std::vector<std::unique_ptr<Obstacle>> obstacles;
+  std::vector<std::unique_ptr<Nutrient>> nutrients;
 };
+

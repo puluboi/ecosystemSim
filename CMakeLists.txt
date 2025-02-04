@@ -8,5 +8,6 @@ src/main.cpp
 src/game.cpp
 src/entity.cpp
 src/obstacle.cpp
+src/nutrient.cpp
 src/graphics/Viz.cpp)
 target_link_libraries(exe sfml-graphics sfml-window sfml-system)

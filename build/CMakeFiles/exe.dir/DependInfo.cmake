@@ -12,6 +12,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/puluboi/ecosystem_sim/src/game.cpp" "CMakeFiles/exe.dir/src/game.cpp.o" "gcc" "CMakeFiles/exe.dir/src/game.cpp.o.d"
   "/home/puluboi/ecosystem_sim/src/graphics/Viz.cpp" "CMakeFiles/exe.dir/src/graphics/Viz.cpp.o" "gcc" "CMakeFiles/exe.dir/src/graphics/Viz.cpp.o.d"
   "/home/puluboi/ecosystem_sim/src/main.cpp" "CMakeFiles/exe.dir/src/main.cpp.o" "gcc" "CMakeFiles/exe.dir/src/main.cpp.o.d"
+  "/home/puluboi/ecosystem_sim/src/nutrient.cpp" "CMakeFiles/exe.dir/src/nutrient.cpp.o" "gcc" "CMakeFiles/exe.dir/src/nutrient.cpp.o.d"
   "/home/puluboi/ecosystem_sim/src/obstacle.cpp" "CMakeFiles/exe.dir/src/obstacle.cpp.o" "gcc" "CMakeFiles/exe.dir/src/obstacle.cpp.o.d"
   )
 

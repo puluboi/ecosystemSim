@@ -269,7 +269,8 @@ CMakeFiles/exe.dir/src/main.cpp.o: \
  /home/linuxbrew/.linuxbrew/include/SFML/Graphics/Text.hpp \
  /home/linuxbrew/.linuxbrew/include/SFML/Graphics/VertexBuffer.hpp \
  /home/puluboi/ecosystem_sim/src/obstacle.hpp \
- /home/puluboi/ecosystem_sim/src/entity.hpp /usr/include/c++/11/random \
+ /home/puluboi/ecosystem_sim/src/entity.hpp \
+ /home/puluboi/ecosystem_sim/src/nutrient.hpp /usr/include/c++/11/random \
  /usr/include/c++/11/cmath /usr/include/math.h \
  /usr/include/x86_64-linux-gnu/bits/math-vector.h \
  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
@@ -297,4 +298,6 @@ CMakeFiles/exe.dir/src/main.cpp.o: \
  /usr/include/x86_64-linux-gnu/c++/11/bits/opt_random.h \
  /usr/include/c++/11/bits/random.tcc /usr/include/c++/11/numeric \
  /usr/include/c++/11/bits/stl_numeric.h \
- /usr/include/c++/11/pstl/glue_numeric_defs.h
+ /usr/include/c++/11/pstl/glue_numeric_defs.h \
+ /usr/include/c++/11/iostream /usr/include/c++/11/istream \
+ /usr/include/c++/11/bits/istream.tcc

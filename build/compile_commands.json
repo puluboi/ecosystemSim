@@ -21,6 +21,11 @@
 },
 {
   "directory": "/home/puluboi/ecosystem_sim/build",
+  "command": "/usr/bin/c++  -isystem /home/linuxbrew/.linuxbrew/include -g -o CMakeFiles/exe.dir/src/nutrient.cpp.o -c /home/puluboi/ecosystem_sim/src/nutrient.cpp",
+  "file": "/home/puluboi/ecosystem_sim/src/nutrient.cpp"
+},
+{
+  "directory": "/home/puluboi/ecosystem_sim/build",
   "command": "/usr/bin/c++  -isystem /home/linuxbrew/.linuxbrew/include -g -o CMakeFiles/exe.dir/src/graphics/Viz.cpp.o -c /home/puluboi/ecosystem_sim/src/graphics/Viz.cpp",
   "file": "/home/puluboi/ecosystem_sim/src/graphics/Viz.cpp"
 }

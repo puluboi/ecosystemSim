@@ -7,6 +7,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/exe.dir/src/graphics/Viz.cpp.o.d"
   "CMakeFiles/exe.dir/src/main.cpp.o"
   "CMakeFiles/exe.dir/src/main.cpp.o.d"
+  "CMakeFiles/exe.dir/src/nutrient.cpp.o"
+  "CMakeFiles/exe.dir/src/nutrient.cpp.o.d"
   "CMakeFiles/exe.dir/src/obstacle.cpp.o"
   "CMakeFiles/exe.dir/src/obstacle.cpp.o.d"
   "exe"

@@ -1,5 +1,6 @@
 #include "entity.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 
@@ -32,7 +33,6 @@ bool Entity::collisionCheck() {
       nextpos;
       if (entityBounds.contains(nextpos)) {
         nextpos = getPos();
-        entity->getDamaged(0.5 * damage);
         return true;
       }
     }
@@ -57,36 +57,50 @@ bool Entity::isObstacleBetween(sf::Vector2f destination) {
   }
   return false;
 }
-
+void Entity::updateVariables() {
+  energy = std::max(0.f, energy - (calcMovementCost()));
+  if (energy < maxEnergy * 0.2) {
+    stamina = std::max(200.f, stamina - 2 * calcMovementCost());
+  } else {
+    stamina = maxStamina;
+  }
+  currentSpeed = std::max(
+      speed * 0.2f, static_cast<float>(currentSpeed * (stamina / 10000.f)));
+  if (energy < maxEnergy * 0.1) {
+    getDamaged(1);
+  }
+}
 void Entity::Update() {
   if (!alive) {
+    if (game.getDeltaTime() - dTime > 3 && !compost) {
+      Compost();
+    }
     return;
   }
   if (checkIfIdle()) {
-    currentSpeed *= agility;
     getRandomPos(wanderRange);
   }
 
   handleEntities();
+  updateVariables();
   if (!isObstacleBetween(destination)) {
     calcNextPos(destination);
     lastpos = shape->getPosition();
     if (collisionCheck()) {
-        getRandomPos(wanderRange*0.2);
-      std::cout << " collision" << std::endl;
+      getRandomPos(wanderRange * 0.2);
     }
+    std::cout << energy << std::endl;
     shape->setPosition(nextpos);
-  }
-  else{
+  } else {
     getRandomPos(wanderRange);
   }
 }
 
 bool Entity::checkIfIdle() {
-sf::Vector2f currentPos = shape->getPosition();
-float distance = std::sqrt(std::pow(destination.x - currentPos.x, 2) +
-                                                     std::pow(destination.y - currentPos.y, 2));
-return distance < 0.5;
+  sf::Vector2f currentPos = shape->getPosition();
+  float distance = std::sqrt(std::pow(destination.x - currentPos.x, 2) +
+                             std::pow(destination.y - currentPos.y, 2));
+  return distance < 0.5;
 }
 
 void Entity::setWanderRange(int range_) { wanderRange = range_; }
@@ -98,6 +112,7 @@ void Entity::setAcceleration(float acceleration_) {
 }
 
 void Entity::getRandomPos(int range) {
+  currentSpeed *= agility;
   sf::Vector2f currentPos = shape->getPosition();
   float randomX =
       currentPos.x +
@@ -130,37 +145,47 @@ void Entity::handleEntities() {
         nearestDistance = distance;
         destination = otherPos;
         if (distance < damageDistance) {
-          if (entity->getDamaged(damage)) {  // if the target dies
+          if (entity->getDamaged(damage)) {  // damages the targe; if the target
+                                             // dies get energy
+            energy += entity->getSize().x * entity->getSize().y * 100;
             getRandomPos(wanderRange);
           }
         }
       }
 
-      if (!chase && distance < minDistance && entity->chase && entity->isAlive()) {
+      if (!chase && distance < minDistance && entity->chase &&
+          entity->isAlive()) {
         tooClose = true;
         sf::Vector2f unitVector = diff / distance;
-        sf::Vector2f dest = currentPos + unitVector * 30.f;
-        if(isObstacleBetween(dest)){
-            dest = sf::Vector2f(dest.x + static_cast<float>(rand() % 20 - 10), dest.y + static_cast<float>(rand() % 20 - 10));
-        }
-        else{
-            destination = dest;
+        sf::Vector2f dest = currentPos + unitVector * 15.f;
+        if (isObstacleBetween(dest)) {
+          dest = sf::Vector2f(dest.x + static_cast<float>(rand() % 20 - 10),
+                              dest.y + static_cast<float>(rand() % 20 - 10));
+        } else {
+          destination = dest;
         }
       }
     }
   }
-
 }
 
 bool Entity::getDamaged(unsigned int damage_) {
   health -= damage_;
-  if (health <= 0) {
+  if (health <= 0) {  // checks if dead
     setAcceleration(0);
     shape->setFillColor(sf::Color::Red);
     alive = false;
+    dTime = game.getDeltaTime();
     return true;
   }
   return false;
+}
+bool Entity::hasComposted() { return compost; }
+void Entity::Compost() {
+  game.addNutrient(getPos());
+  compost = true;
+  auto& entities = game.getEntities();
+  game.removeEntity(id);
 }
 // Calc the next position
 void Entity::calcNextPos(sf::Vector2f destinaton) {
@@ -180,3 +205,9 @@ void Entity::calcNextPos(sf::Vector2f destinaton) {
 }
 
 unsigned int Entity::getId() { return id; }
+
+float Entity::calcMovementCost() {
+  return currentSpeed * getSize().x * getSize().y * agility /
+         140.f;  // 140 is a arbitrary variable meant to keep the cost
+                 // relatively low
+}
