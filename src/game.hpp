@@ -1,13 +1,14 @@
 #pragma once
 
-#include "memory.h"
-#include "graphics/Viz.hpp"
-#include <vector>
-#include "obstacle.hpp"
-#include "entity.hpp"
-#include "nutrient.hpp"
-#include <random>
 #include <iostream>
+#include <random>
+#include <vector>
+
+#include "entity.hpp"
+#include "graphics/Viz.hpp"
+#include "memory.h"
+#include "nutrient.hpp"
+#include "obstacle.hpp"
 class Game {
  public:
   void Update();
@@ -20,6 +21,7 @@ class Game {
   bool isRunning();
   bool initGame();
   std::vector<std::unique_ptr<Obstacle>>& getObstacles();
+  std::vector<std::unique_ptr<Nutrient>>& getNutrients();
   void initEntities();
   void initObstacles();
   std::vector<std::unique_ptr<Entity>>& getEntities();
@@ -31,10 +33,9 @@ class Game {
   void updateEntities();
 
  private:
- Viz viz;
-sf::Clock clock;
+  Viz viz;
+  sf::Clock clock;
   std::vector<std::unique_ptr<Entity>> entities;
   std::vector<std::unique_ptr<Obstacle>> obstacles;
   std::vector<std::unique_ptr<Nutrient>> nutrients;
 };
-

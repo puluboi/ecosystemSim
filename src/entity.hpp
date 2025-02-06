@@ -36,6 +36,8 @@ class Entity {
 
   void getFurthestPos();
 
+  sf::Vector2f getDirection();
+
   bool getDamaged(unsigned int damage_);
 
   bool hasComposted();
@@ -61,23 +63,23 @@ class Entity {
   sf::Vector2f nextpos;
   sf::Vector2f lastpos;
   float speed = 1;      // max speed
-  float agility = 0.7;  // agility: much speed is preserved when idle.
+  float agility = 0.3;  // agility: much speed is preserved when idle.
   unsigned int maxEnergy = 20000;
   unsigned int maxStamina = 10000;
   unsigned int energy = 10000;
   unsigned int stamina = 10000;
   float currentSpeed = 0;
   float acceleration = 0.01;
-  float minDistance = 140;
-  float aggroDistance = 200;
-  float damageDistance = 20;
-  bool chase = false;
-  int wanderRange = 300;
-  unsigned int damage = 100;
-  int health = 100;
-  unsigned int id;
-  bool alive = true;
-  bool compost = false;
+  float minDistance = 140; //Distance for running away
+  float aggroDistance = 200; //Distance to for aggroing 
+  float damageDistance = 20; // Distance required to deal damage
+  bool chase = false; // If the entity chases other entities
+  int wanderRange = 300; // How far the entity can get a random point
+  unsigned int damage = 100; // How much damage the entity deals
+  int health = 100;  // how much health the entity has
+  unsigned int id; // entitys personal id
+  bool alive = true; // Whether the entity is alive or...
+  bool compost = false; // whether the entity has been composted
   float dTime;  // time of death
   Game& game;
 };

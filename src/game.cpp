@@ -61,6 +61,9 @@ bool Game::initGame() {
 std::vector<std::unique_ptr<Obstacle>>& Game::getObstacles() {
   return obstacles;
 }
+std::vector<std::unique_ptr<Nutrient>>& Game::getNutrients() {
+  return nutrients;
+}
 void Game::initEntities() {
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -78,7 +81,7 @@ void Game::initEntities() {
     return false;
   };
 
-  for (size_t i = 0; i < 300; i++) {
+  for (size_t i = 0; i < 1000; i++) {
     float x, y;
     sf::Vector2f pos;
     do {
@@ -88,7 +91,7 @@ void Game::initEntities() {
     } while (isInsideObstacle(pos, sf::Vector2f(10.f, 10.f)));
 
     addEntity(pos, sf::Vector2f(10.f, 10.f), sf::Color::Black);
-    if (i % 10 == 0) {
+    if (i % 20 == 0) {
       entities[i]->setChase(true);
       entities[i]->getShape()->setSize(sf::Vector2f(20.f, 20.f));
     }
