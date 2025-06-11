@@ -18,6 +18,10 @@ void Game::Update() {
     lastNutrientSpawnTime = currentSecond;
     
   };
+  
+  // Handle entity clicking
+  handleEntityClick();
+  
   updateEntities();
   viz.Update();
   printAliveEntities();
@@ -117,7 +121,7 @@ void Game::initEntities() {
     return false;
   };
 
-  for (size_t i = 0; i < 200; i++) {
+  for (size_t i = 0; i < 50; i++) {
     float x, y;
     sf::Vector2f pos;
     do {
@@ -180,6 +184,13 @@ void Game::updateEntities() {
   for (auto& entity : entities) {
     if (entity != nullptr) {
       entity->Update();
+      if(entity->getShape() == viz.getLastClickedObj()){
+        std::cout << "Entity ID: " << entity->getId() << std::endl;
+        std::cout << "Position: (" << entity->getPos().x << ", " << entity->getPos().y << ")" << std::endl;
+        std::cout << "Size: (" << entity->getSize().x << ", " << entity->getSize().y << ")" << std::endl;
+        std::cout << "Energy: " << entity->getEnergy() << std::endl;
+        std::cout << "Alive: " << (entity->isAlive() ? "Yes" : "No") << std::endl;
+      }
     }
   }
   // Remove entities marked for removal
@@ -200,7 +211,78 @@ void Game::spawnNutrient() {
 
   sf::Vector2f pos(dis(gen), dis(gen));
   
-  unsigned int energy = static_cast<unsigned int>(dis(gen)) % 1000 + 500; // Random energy between 50 and 149
+  unsigned int energy = static_cast<unsigned int>(dis(gen)) % 2500 + 500; // Random energy between 500 and 3000
 
   addNutrient(pos, getNutrients().size(), energy);
+}
+
+Entity* Game::findEntityAtPosition(sf::Vector2f position) {
+  for (const auto& entity : entities) {
+    if (entity && entity->isAlive()) {
+      sf::FloatRect entityBounds = entity->getShape()->getGlobalBounds();
+      if (entityBounds.contains(position)) {
+        return entity.get();
+      }
+    }
+  }
+  return nullptr;
+}
+
+void Game::handleEntityClick() {
+  if (viz.wasClicked()) {
+    sf::Vector2f clickPos = viz.getClickPosition();
+    Entity* clickedEntity = findEntityAtPosition(clickPos);
+    
+    if (clickedEntity) {
+      selectedEntity = clickedEntity;
+      std::string stats = getEntityStats(selectedEntity);
+      viz.setEntityStats(stats);
+    } else {
+      // Clear selection if clicked on empty space
+      selectedEntity = nullptr;
+      viz.setEntityStats("");
+    }
+    
+    viz.clearClick(); // Clear the click flag
+  }
+  
+  // Update stats if we have a selected entity (in case it changes)
+  if (selectedEntity && selectedEntity->isAlive()) {
+    std::string stats = getEntityStats(selectedEntity);
+    viz.setEntityStats(stats);
+  } else if (selectedEntity && !selectedEntity->isAlive()) {
+    // Clear selection if entity died
+    selectedEntity = nullptr;
+    viz.setEntityStats("");
+  }
+}
+
+std::string Game::getEntityStats(const Entity* entity) {
+  if (!entity) return "";
+  
+  std::string behaviorStr;
+  switch (entity->currentBehavior) {
+    case Entity::IDLE: behaviorStr = "IDLE"; break;
+    case Entity::CHASING: behaviorStr = "CHASING"; break;
+    case Entity::FLEEING: behaviorStr = "FLEEING"; break;
+    case Entity::CRAVING: behaviorStr = "CRAVING"; break;
+    case Entity::DOWN_BAD: behaviorStr = "DOWN_BAD"; break;
+    default: behaviorStr = "UNKNOWN"; break;
+  }
+  
+  return 
+    "Selected Entity: " + entity->getId() + "\n" +
+    "Behavior: " + behaviorStr + "\n" +
+    "Health: " + std::to_string(entity->getHealth()) + "/" + std::to_string(entity->getBaseHealth()) + "\n" +
+    "Energy: " + std::to_string(entity->getEnergy()) + "/" + std::to_string(entity->getMaxEnergy()) + "\n" +
+    "Stamina: " + std::to_string(entity->getStamina()) + "/" + std::to_string(entity->getMaxStamina()) + "\n" +
+    "Speed: " + std::to_string(static_cast<int>(entity->getSpeed() * 100)) + " (Current: " + std::to_string(static_cast<int>(entity->getCurrentSpeed() * 100)) + ")\n" +
+    "Agility: " + std::to_string(static_cast<int>(entity->getAgility() * 100)) + "%\n" +
+    "Efficiency: " + std::to_string(static_cast<int>(entity->getEfficiency() * 100)) + "%\n" +
+    "Aggression: " + std::to_string(static_cast<int>(entity->getAggression() * 100)) + "%\n" +
+    "Acceleration: " + std::to_string(static_cast<int>(entity->getAcceleration() * 1000)) + "\n" +
+    "Threat: " + std::to_string(entity->getThreat()) + "\n" +
+    "Damage: " + std::to_string(entity->getDamage()) + "\n" +
+    "Position: (" + std::to_string(static_cast<int>(entity->getPos().x)) +
+    ", " + std::to_string(static_cast<int>(entity->getPos().y)) + ")";
 }

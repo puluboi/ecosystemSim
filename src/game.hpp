@@ -36,9 +36,15 @@ class Game {
   void updateEntities();
 
   void spawnNutrient();
+  
+  // Entity selection methods
+  Entity* findEntityAtPosition(sf::Vector2f position);
+  void handleEntityClick();
+  std::string getEntityStats(const Entity* entity);
 
  private:
  int lastNutrientSpawnTime = -1; // Initialize to -1 to ensure first spawn works
+  Entity* selectedEntity = nullptr; // Currently selected entity
   Viz viz;
   sf::Clock clock;
   std::vector<std::unique_ptr<Entity>> entities;

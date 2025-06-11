@@ -81,7 +81,14 @@ void Viz::pollEvents() {
         break;
       case sf::Event::KeyPressed:
         if (this->ev.key.code == sf::Keyboard::Escape) this->window->close();
-
+        break;
+      case sf::Event::MouseButtonPressed:
+        if (this->ev.mouseButton.button == sf::Mouse::Left) {
+          // Convert screen coordinates to world coordinates
+          sf::Vector2i mousePos(this->ev.mouseButton.x, this->ev.mouseButton.y);
+          lastClickPos = this->window->mapPixelToCoords(mousePos);
+          hasClick = true;
+        }
         break;
     }
   }
@@ -90,7 +97,9 @@ void Viz::pollEvents() {
 void Viz::Update() {
   this->deltaTime = clock.restart();  // update the delta time
   this->updateViewPos();              // update the position of the camera
+  this->handleMouseClick();
   this->pollEvents();                 // check all the events.
+  
 }
 /*
     Renders the objects and clears the old frame.
@@ -105,6 +114,10 @@ void Viz::Render() {
   }
   std::string coords = std::to_string(static_cast<int>(view.getCenter().x)) + ", " + std::to_string(static_cast<int>(view.getCenter().y))+ '\n' + std::to_string(alive);
   printToScreen(coords, sf::Vector2f(10.f,10.f));
+  
+  // Display entity stats if available
+  displayEntityStats();
+  
   this->window->display();
 }
 /*
@@ -154,4 +167,64 @@ void Viz::printToScreen(std::string text, sf::Vector2f pos) {
   sfText.setPosition(viewTopRight.x - pos.x, viewTopRight.y + pos.y);
 
   window->draw(sfText);
+}
+std::shared_ptr<sf::RectangleShape> Viz::getLastClickedObj(){
+  return lastClickedObject;
+}
+void Viz::handleMouseClick() {
+  if (hasClick) {
+    for (auto& obj : objects) {
+      if (obj->getGlobalBounds().contains(lastClickPos)) {
+        std::cout << "Object clicked at position: (" << lastClickPos.x << ", " << lastClickPos.y << ")" << std::endl;
+        lastClickedObject = obj;
+        break;
+      }
+    }
+  }
+}
+
+sf::Vector2f Viz::getClickPosition() {
+  return lastClickPos;
+}
+
+bool Viz::wasClicked() {
+  return hasClick;
+}
+
+void Viz::clearClick() {
+  hasClick = false;
+}
+
+void Viz::setEntityStats(const std::string& stats) {
+  entityStatsText = stats;
+}
+
+void Viz::displayEntityStats() {
+  if (!entityStatsText.empty()) {
+    sf::Font font;
+    if (!font.loadFromFile("Roboto/Roboto-Bold.ttf")) {
+      std::cerr << "Error loading font" << std::endl;
+      return;
+    }
+
+    sf::Text sfText;
+    sfText.setFont(font);
+    sfText.setString(entityStatsText);
+    sfText.setCharacterSize(18);
+    sfText.setFillColor(sf::Color::White);
+    
+    // Position the stats panel on the left side
+    sf::Vector2f viewTopLeft = window->mapPixelToCoords(sf::Vector2i(0, 0));
+    sfText.setPosition(viewTopLeft.x + 10, viewTopLeft.y + 60);
+
+    // Draw a background rectangle for better readability
+    sf::FloatRect textBounds = sfText.getLocalBounds();
+    sf::RectangleShape background;
+    background.setSize(sf::Vector2f(textBounds.width + 20, textBounds.height + 20));
+    background.setPosition(viewTopLeft.x + 5, viewTopLeft.y + 55);
+    background.setFillColor(sf::Color(0, 0, 0, 180)); // Semi-transparent black
+
+    window->draw(background);
+    window->draw(sfText);
+  }
 }

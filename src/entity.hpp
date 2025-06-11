@@ -12,10 +12,10 @@ class Entity {
 
   std::shared_ptr<sf::RectangleShape> getShape();
 
-  sf::Vector2f getPos();
+  sf::Vector2f getPos() const;
   void setPos(sf::Vector2f pos);
   void setEnergy(int newEnergy);
-  int getEnergy();
+  int getEnergy() const;
   sf::Vector2f getSize();
 Entity(std::shared_ptr<sf::RectangleShape> shape_, Game& game_,
                       std::string id_, const Entity& parent1, const Entity& parent2);
@@ -67,20 +67,37 @@ void calcNextPos(sf::Vector2f destination);
 // Set's
 void setAcceleration(float acceleration_);
 
-unsigned int getThreat();
+unsigned int getThreat() const;
 void setThreat(unsigned int input);
 
-float getAggression();
+float getAggression() const;
 
 void setSpeed(float speed_);
-int getHealth();
-float getEfficiency();
+int getHealth() const;
+float getEfficiency() const;
 void setEfficiency(float efficiency_);
 void setKillerEfficiency(float efficiency_);
 void calcKeyValues();
 void setWanderRange(int range_);
 
-std::string getId();
+std::string getId() const;
+
+// Additional getter functions for all variables
+float getSpeed() const;
+float getAgility() const;
+unsigned int getMaxEnergy() const;
+unsigned int getMaxStamina() const;
+unsigned int getStamina() const;
+float getCurrentSpeed() const;
+float getAcceleration() const;
+float getMinDistance() const;
+float getDamageDistance() const;
+bool getChase() const;
+int getWanderRange() const;
+unsigned int getDamage() const;
+int getBaseHealth() const;
+float getKillerEfficiency() const;
+sf::Vector2f getDestination() const;
 
 bool toBeRemoved = false;  // mark for deferred removal
 

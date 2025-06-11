@@ -9,12 +9,12 @@
 
 std::shared_ptr<sf::RectangleShape> Entity::getShape() { return shape; }
 
-sf::Vector2f Entity::getPos() { return shape->getPosition(); }
+sf::Vector2f Entity::getPos() const { return shape->getPosition(); }
 
 void Entity::setPos(sf::Vector2f pos) { shape->setPosition(pos); }
 
 void Entity::setEnergy(int newEnergy) { energy = newEnergy; }
-int Entity::getEnergy() { return energy; }
+int Entity::getEnergy() const { return energy; }
 
 sf::Vector2f Entity::getSize() { return shape->getSize(); }
 
@@ -199,8 +199,8 @@ bool Entity::checkIfIdle() {
 void Entity::setWanderRange(int range_) { wanderRange = range_; }
 
 void Entity::setSpeed(float speed_) { speed = speed_; }
-int Entity::getHealth() { return health; }
-float Entity::getEfficiency() { return efficiency; }
+int Entity::getHealth() const { return health; }
+float Entity::getEfficiency() const { return efficiency; }
 
 void Entity::setEfficiency(float efficiency_) { efficiency = efficiency_; }
 void Entity::setKillerEfficiency(float efficiency_) {
@@ -214,9 +214,9 @@ void Entity::calcKeyValues() {
 void Entity::setAcceleration(float acceleration_) {
   acceleration = acceleration_;
 }
-unsigned int Entity::getThreat() { return threatFactor; }
+unsigned int Entity::getThreat() const { return threatFactor; }
 void Entity::setThreat(unsigned int input) { threatFactor = input; }
-float Entity::getAggression() { return aggression; }
+float Entity::getAggression() const { return aggression; }
 void Entity::getRandomPos(int range) {
   currentSpeed *= agility;
   sf::Vector2f currentPos = shape->getPosition();
@@ -404,7 +404,7 @@ void Entity::calcNextPos(sf::Vector2f destinaton) {
   }
 }
 
-std::string Entity::getId() { return id; }
+std::string Entity::getId() const { return id; }
 
 float Entity::calcMovementCost() {
   /*std::cout << "Current Speed: " << currentSpeed * 3
@@ -428,3 +428,20 @@ float Entity::calcMovementCost() {
           agility * 3) *
          0.1;
 }
+
+// Additional getter function implementations
+float Entity::getSpeed() const { return speed; }
+float Entity::getAgility() const { return agility; }
+unsigned int Entity::getMaxEnergy() const { return maxEnergy; }
+unsigned int Entity::getMaxStamina() const { return maxStamina; }
+unsigned int Entity::getStamina() const { return stamina; }
+float Entity::getCurrentSpeed() const { return currentSpeed; }
+float Entity::getAcceleration() const { return acceleration; }
+float Entity::getMinDistance() const { return minDistance; }
+float Entity::getDamageDistance() const { return damageDistance; }
+bool Entity::getChase() const { return chase; }
+int Entity::getWanderRange() const { return wanderRange; }
+unsigned int Entity::getDamage() const { return damage; }
+int Entity::getBaseHealth() const { return baseHealth; }
+float Entity::getKillerEfficiency() const { return killerEfficiency; }
+sf::Vector2f Entity::getDestination() const { return destination; }

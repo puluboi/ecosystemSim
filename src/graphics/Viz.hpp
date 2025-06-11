@@ -12,6 +12,9 @@ class Viz {
    */
 public:
 int alive;
+sf::Vector2f lastClickPos;
+bool hasClick = false;
+std::string entityStatsText = ""; // Store entity stats for HUD display
  private:
   // private variables
   // Window
@@ -32,6 +35,7 @@ int alive;
   // Game objects
   sf::RectangleShape obj;
   std::vector<std::shared_ptr<sf::RectangleShape>> objects;
+  std::shared_ptr<sf::RectangleShape> lastClickedObject;
 
  public:
   // Variables
@@ -66,5 +70,12 @@ int alive;
     Remove an object from the render que;
     */
   void printToScreen(std::string text, sf::Vector2f pos);
+  std::shared_ptr<sf::RectangleShape> getLastClickedObj();
+  void handleMouseClick();
+  void displayEntityStats();
+  void setEntityStats(const std::string& stats);
+  sf::Vector2f getClickPosition();
+  bool wasClicked();
+  void clearClick();
 };
 #endif
