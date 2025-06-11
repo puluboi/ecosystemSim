@@ -283,6 +283,7 @@ std::string Game::getEntityStats(const Entity* entity) {
     "Acceleration: " + std::to_string(static_cast<int>(entity->getAcceleration() * 1000)) + "\n" +
     "Threat: " + std::to_string(entity->getThreat()) + "\n" +
     "Damage: " + std::to_string(entity->getDamage()) + "\n" +
+    "Sensing Distance: " + std::to_string(static_cast<int>(entity->getMinDistance())) + "\n" +
     "Position: (" + std::to_string(static_cast<int>(entity->getPos().x)) +
     ", " + std::to_string(static_cast<int>(entity->getPos().y)) + ")";
 }

@@ -12,9 +12,6 @@ class Viz {
    */
 public:
 int alive;
-sf::Vector2f lastClickPos;
-bool hasClick = false;
-std::string entityStatsText = ""; // Store entity stats for HUD display
  private:
   // private variables
   // Window
@@ -26,6 +23,14 @@ std::string entityStatsText = ""; // Store entity stats for HUD display
   // time between frames
   sf::Time deltaTime;
 
+  // Click handling variables
+  sf::Vector2f lastClickPos;
+  bool hasClick = false;
+  std::shared_ptr<sf::RectangleShape> lastClickedObject;
+  
+  // HUD variables
+  std::string entityStatsText = ""; // Store entity stats for HUD display
+
   // Private functions
   void initVariables();
   void initObjects();
@@ -35,7 +40,6 @@ std::string entityStatsText = ""; // Store entity stats for HUD display
   // Game objects
   sf::RectangleShape obj;
   std::vector<std::shared_ptr<sf::RectangleShape>> objects;
-  std::shared_ptr<sf::RectangleShape> lastClickedObject;
 
  public:
   // Variables

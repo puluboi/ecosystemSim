@@ -70,10 +70,10 @@ Entity::Entity(std::shared_ptr<sf::RectangleShape> shape_, Game& game_,
 void Entity::inheritVariables(const Entity& parent1, const Entity& parent2) {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::normal_distribution<float> dist(0.f, 0.2f);  // Mean 0, Std Dev 0.2
+  std::normal_distribution<float> dist(0.f, 0.1f);  // Mean 0, Std Dev 0.2
 
   auto mixVariable = [&](float var1, float var2) {
-    return var1 * 0.5 + var2 * 0.5 + dist(gen);
+    return var1 * 0.5 + var2 * 0.5 + dist(gen)*(var1 + var2);
   };
 
   speed = mixVariable(parent1.speed, parent2.speed);
@@ -108,7 +108,7 @@ void Entity::initRandVariables() {
   wanderRange = 300.0f * (0.5f + static_cast<float>(rand()) / RAND_MAX);
   damage = 10.0f * (0.5f + static_cast<float>(rand()) / RAND_MAX);
   baseHealth = 100.0f * (0.5f + static_cast<float>(rand()) / RAND_MAX);
-  aggression = static_cast<float>(rand()) / RAND_MAX;
+  aggression = 0.3f + static_cast<float>(rand()) / RAND_MAX * (1.0f - 0.3f);
 }
 
 bool Entity::collisionCheck() {
@@ -153,6 +153,9 @@ void Entity::updateVariables() {
       speed * 0.2f, static_cast<float>(currentSpeed * (stamina * 0.0001)));
   if (energy < maxEnergy * 0.1) {
     getDamaged(2);
+  }
+  else{
+    health = std::min(health+1, baseHealth);
   }
 }
 void Entity::Update() {
@@ -208,12 +211,13 @@ void Entity::setKillerEfficiency(float efficiency_) {
 }
 void Entity::calcKeyValues() {
   senseFactor = minDistance;
-  threatFactor = (baseHealth * 0.01 + speed + damage);
+  threatFactor = (baseHealth * 0.01 + speed + damage*0.1)*5;
   shape->setSize(sf::Vector2f((float)threatFactor, (float)threatFactor));
 }
 void Entity::setAcceleration(float acceleration_) {
   acceleration = acceleration_;
 }
+
 unsigned int Entity::getThreat() const { return threatFactor; }
 void Entity::setThreat(unsigned int input) { threatFactor = input; }
 float Entity::getAggression() const { return aggression; }
@@ -245,9 +249,9 @@ void Entity::handleEntities() {
       sf::Vector2f otherPos = entity->getPos();
       sf::Vector2f diff = currentPos - otherPos;
       float distance = std::sqrt(diff.x * diff.x + diff.y * diff.y);
-
+      
       // CHASE logic
-      if (distance < nearestDistance && entity->isAlive() &&
+      if (efficiency> 0.4 && distance < nearestDistance && entity->isAlive() &&
           currentBehavior != DOWN_BAD &&
           entity->getThreat() < threatFactor * aggression &&
           distance < minDistance && !isObstacleBetween(otherPos) &&
@@ -268,6 +272,20 @@ void Entity::handleEntities() {
           }
         }
       }
+      // DEFENSE logic
+      else if(distance < nearestDistance && entity->isAlive() && distance<damageDistance && entity->getThreat() * entity->getAggression()>= threatFactor && entity->getEfficiency()>0.4){
+        nearestDistance = distance;
+        if (entity->getDamaged(damage)) {  // returns true if is killed
+            energy += entity->getEnergy() * efficiency;
+            if (energy > maxEnergy * 0.5) {
+              currentBehavior = DOWN_BAD;
+            }
+            currentBehavior = IDLE;
+            getRandomPos(wanderRange);
+            entity->setKillerEfficiency(efficiency);
+            return;
+          }
+      }
       // FLEE logic
       else if (distance < minDistance && entity->isAlive() &&
                entity->getAggression() * entity->getThreat() >= getThreat()) {
@@ -283,7 +301,7 @@ void Entity::handleEntities() {
         }
       } else {  // IF IDLE
         // only reset to IDLE if we're not already in FLEEING or CRAVING state
-        if (currentBehavior != FLEEING && currentBehavior != CRAVING &&
+        if (currentBehavior != FLEEING && currentBehavior != CRAVING && currentBehavior != CHASING &&
             currentBehavior != DOWN_BAD) {
           currentBehavior = IDLE;
         }
@@ -292,8 +310,8 @@ void Entity::handleEntities() {
   }
 
   // NUTRIENT SEEK logic
-  if (efficiency < 0.3 && currentBehavior != FLEEING &&
-      currentBehavior != DOWN_BAD) {
+  if (efficiency < 0.5 && currentBehavior != FLEEING &&
+      currentBehavior != DOWN_BAD && currentBehavior != CHASING) {
     float mindistance = 100;
     bool foundAccessibleNutrient = false;
     sf::Vector2f closestNutrientPos;
@@ -304,7 +322,7 @@ void Entity::handleEntities() {
         sf::Vector2f diff = currentPos - otherPos;
         float distance = std::sqrt(diff.x * diff.x + diff.y * diff.y);
 
-        if (distance <= minDistance * energy / maxEnergy * efficiency + 40 &&
+        if (distance <= minDistance &&
             !isObstacleBetween(otherPos)) {
           mindistance = distance;
           closestNutrientPos = otherPos;
@@ -423,8 +441,8 @@ float Entity::calcMovementCost() {
             << " (Multiplier: 80), "
                "Agility: "
             << agility * 3 << " (Multiplier: 3)" << std::endl;*/
-  return (currentSpeed * 3 + threatFactor * threatFactor * 0.01 +
-          senseFactor * 0.01 + aggression * 2 + acceleration * 80 +
+  return (currentSpeed * 3 + threatFactor * threatFactor * 0.05 +
+          senseFactor * 0.01 + acceleration * 80 +
           agility * 3) *
          0.1;
 }
