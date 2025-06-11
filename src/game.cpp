@@ -52,7 +52,7 @@ void Game::removeEntity(std::string id){
 void Game::spawnEntity(const std::unique_ptr<Entity>& parent1, const std::unique_ptr<Entity>& parent2){
   sf::Color p1c = parent1->getShape()->getFillColor();
   sf::Color p2c = parent1->getShape()->getFillColor();
-  sf::Color color = sf::Color((p1c.a+p2c.r)/2, (p1c.b+p2c.g)/2, (p1c.b+p2c.b)/2, 255);
+  sf::Color color = sf::Color((p1c.r+p2c.r)/2, (p1c.b+p2c.b)/2, (p1c.g+p2c.g)/2, 255);
   
   auto shape = viz.addObject(parent1->getPos(),parent2->getSize() , color);
   Entity ent = Entity(shape, *this,

@@ -70,7 +70,7 @@ Entity::Entity(std::shared_ptr<sf::RectangleShape> shape_, Game& game_,
 void Entity::inheritVariables(const Entity& parent1, const Entity& parent2) {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::normal_distribution<float> dist(0.f, 0.1f);  // Mean 0, Std Dev 0.2
+  std::normal_distribution<float> dist(0.f, 0.001f);  // Mean 0, Std Dev 0.2
 
   auto mixVariable = [&](float var1, float var2) {
     return var1 * 0.5 + var2 * 0.5 + dist(gen)*(var1 + var2);
@@ -98,17 +98,28 @@ void Entity::initRandVariables() {
   damage - 10
   basehealth - 100
   */
-  speed = 0.3f + static_cast<float>(rand()) / RAND_MAX * (0.9f - 0.1f);
-  agility = 0.3f + static_cast<float>(rand()) / RAND_MAX * (0.9f - 0.3f);
-  efficiency = static_cast<float>(rand()) / RAND_MAX;
-  acceleration = 0.01f * (0.5f + static_cast<float>(rand()) / RAND_MAX);
-  minDistance =
-      30.0f + static_cast<float>(rand()) / RAND_MAX *
-                  (140.0f - 30.0f);  // MinDistance is between 30 and 140
-  wanderRange = 300.0f * (0.5f + static_cast<float>(rand()) / RAND_MAX);
-  damage = 10.0f * (0.5f + static_cast<float>(rand()) / RAND_MAX);
-  baseHealth = 100.0f * (0.5f + static_cast<float>(rand()) / RAND_MAX);
-  aggression = 0.3f + static_cast<float>(rand()) / RAND_MAX * (1.0f - 0.3f);
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+  std::normal_distribution<float> outlierDist(0.0f, 2.f);  // Mean 0, Std Dev 0.2
+
+  auto generateValue = [&](float nmin, float nmax, float hmin, float hmax) { //norm min/max && hard min/max
+    float value = nmin + dist(gen) * (nmax - nmin);
+    if (dist(gen) < 0.05f) {  // 5% chance to generate an outlier
+      value = std::clamp(value + std::clamp(outlierDist(gen), -30.f,30.f) * (nmax - nmin), hmin, hmax);
+    }
+    return value;
+  };
+
+  speed = generateValue(0.3f, 0.9f, 0.05f, 10.f);
+  agility = generateValue(0.3f, 0.9f, 0.0f, 1.0f);
+  efficiency = generateValue(0.0f, 1.0f, 0.f, 1.f);
+  acceleration = generateValue(0.005f, 0.015f, 0.0001f, 0.2f);
+  minDistance = generateValue(30.0f, 140.0f, 25.f, 400.f);
+  wanderRange = generateValue(150.0f, 450.0f, 5.f, 500.f);
+  baseHealth = generateValue(50.0f, 150.0f, 5.f, 1000.f);
+  damage = generateValue(5.f, 40.f, 0.0f, 150.0f)*baseHealth*0.01;
+  aggression = std::clamp(generateValue(0.3f, 1.0f, 0.f, 1.0f)*efficiency, 0.f, 1.f);
 }
 
 bool Entity::collisionCheck() {
@@ -211,8 +222,10 @@ void Entity::setKillerEfficiency(float efficiency_) {
 }
 void Entity::calcKeyValues() {
   senseFactor = minDistance;
-  threatFactor = (baseHealth * 0.01 + speed + damage*0.1)*5;
-  shape->setSize(sf::Vector2f((float)threatFactor, (float)threatFactor));
+  threatFactor = (speed + damage*0.1)*7;
+  shape->setSize(sf::Vector2f(baseHealth*0.12, baseHealth*0.12));
+  shape->setOutlineThickness(3);
+  shape->setOutlineColor(sf::Color(std::min(threatFactor*5.f*aggression*efficiency, 255.f), 0.f, 0.f));
 }
 void Entity::setAcceleration(float acceleration_) {
   acceleration = acceleration_;
@@ -311,7 +324,7 @@ void Entity::handleEntities() {
 
   // NUTRIENT SEEK logic
   if (efficiency < 0.5 && currentBehavior != FLEEING &&
-      currentBehavior != DOWN_BAD && currentBehavior != CHASING) {
+      currentBehavior != DOWN_BAD && currentBehavior != CHASING&& energy<maxEnergy) {
     float mindistance = 100;
     bool foundAccessibleNutrient = false;
     sf::Vector2f closestNutrientPos;
@@ -355,14 +368,17 @@ void Entity::handleEntities() {
     }
   }
   // DOWN BAD logic
-  if (currentBehavior == DOWN_BAD && stamina > 0.3*maxStamina) {
+  if (energy > 0.7*maxEnergy && stamina > 0.3*maxStamina) {
+    currentBehavior = DOWN_BAD;
+    float nearestDistance = minDistance;
     for (const auto& entity : game.getEntities()) {
       if (entity->getId() != id && entity->currentBehavior == DOWN_BAD) {
         sf::Vector2f otherPos = entity->getPos();
         sf::Vector2f diff = getPos() - otherPos;
         float distance = std::sqrt(diff.x * diff.x + diff.y * diff.y);
 
-        if (distance < minDistance && !isObstacleBetween(otherPos)) {
+        if (distance < minDistance && distance < nearestDistance && !isObstacleBetween(otherPos)) {
+          nearestDistance = distance;
           destination = otherPos;
           if (distance < damageDistance) {
             currentBehavior = IDLE;
@@ -392,6 +408,7 @@ bool Entity::getDamaged(unsigned int damage_) {
   if (health <= 0) {  // checks if dead
     setAcceleration(0);
     shape->setFillColor(sf::Color::Red);
+    shape->setOutlineColor(sf::Color::Red);
     alive = false;
     dTime = game.getDeltaTime();
     return true;
@@ -441,7 +458,7 @@ float Entity::calcMovementCost() {
             << " (Multiplier: 80), "
                "Agility: "
             << agility * 3 << " (Multiplier: 3)" << std::endl;*/
-  return (currentSpeed * 3 + threatFactor * threatFactor * 0.05 +
+  return (currentSpeed * health * 0.05 +
           senseFactor * 0.01 + acceleration * 80 +
           agility * 3) *
          0.1;
