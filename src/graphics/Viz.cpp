@@ -100,8 +100,8 @@ void Viz::Render() {
   this->window->clear(backgroundColor);
 
   // Draw visualisation objects
-  for (auto& ob : objects) {
-    this->window->draw(*ob);
+  for (auto it = objects.rbegin(); it != objects.rend(); ++it) {
+    this->window->draw(**it);
   }
   std::string coords = std::to_string(static_cast<int>(view.getCenter().x)) + ", " + std::to_string(static_cast<int>(view.getCenter().y))+ '\n' + std::to_string(alive);
   printToScreen(coords, sf::Vector2f(10.f,10.f));
@@ -114,6 +114,7 @@ std::shared_ptr<sf::RectangleShape> Viz::addObject(const sf::Vector2f& pos, cons
     auto newObj = std::make_shared<sf::RectangleShape>(size);
     newObj->setFillColor(color);
     newObj->setPosition(pos);
+
     objects.push_back(newObj);
 
     return newObj;

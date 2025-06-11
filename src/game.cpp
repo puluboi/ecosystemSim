@@ -7,6 +7,17 @@
 
 
 void Game::Update() {
+  int currentSecond = static_cast<int>(getDeltaTime());
+
+  if(static_cast<int>(getDeltaTime()) % 2 == 1 && currentSecond != lastNutrientSpawnTime){
+    for (size_t i = 0; i < 10; i++)
+    {
+      spawnNutrient();
+    }
+    
+    lastNutrientSpawnTime = currentSecond;
+    
+  };
   updateEntities();
   viz.Update();
   printAliveEntities();
@@ -21,7 +32,7 @@ bool Game::addObstacle(sf::Vector2f pos, sf::Vector2f size, sf::Color color) {
   obstacles.push_back(std::make_unique<Obstacle>(obs));
   return obs.getShape() != nullptr;
 }
-void Game::removeEntity(unsigned int id){
+void Game::removeEntity(std::string id){
   auto it = entities.begin();
   for (; it != entities.end(); it++) {
     if ((*it)->getId() == id) {
@@ -34,21 +45,46 @@ void Game::removeEntity(unsigned int id){
     entities.erase(it);
   }
 }
+void Game::spawnEntity(const std::unique_ptr<Entity>& parent1, const std::unique_ptr<Entity>& parent2){
+  sf::Color p1c = parent1->getShape()->getFillColor();
+  sf::Color p2c = parent1->getShape()->getFillColor();
+  sf::Color color = sf::Color((p1c.a+p2c.r)/2, (p1c.b+p2c.g)/2, (p1c.b+p2c.b)/2, 255);
+  
+  auto shape = viz.addObject(parent1->getPos(),parent2->getSize() , color);
+  Entity ent = Entity(shape, *this,
+                      parent1->getId());  // Pass the shared_ptr directly
 
-bool Game::addEntity(sf::Vector2f pos, sf::Vector2f size, sf::Color color) {
+  ent.setEnergy(4000);
+  entities.push_back(std::make_unique<Entity>(ent));
+}
+bool Game::addEntity(sf::Vector2f pos, sf::Vector2f size, sf::Color color, std::string id) {
+  std::cout<<id<<std::endl;
   auto shape = viz.addObject(pos, size, color);
   Entity ent = Entity(shape, *this,
-                      entities.size() + 1);  // Pass the shared_ptr directly
+                      id);  // Pass the shared_ptr directly
   entities.push_back(std::make_unique<Entity>(ent));
   return ent.getShape() != nullptr;
 }
-bool Game::addNutrient(sf::Vector2f pos, unsigned int id){
+bool Game::addNutrient(sf::Vector2f pos, unsigned int id, unsigned int energy){
   auto shape = viz.addObject(pos, sf::Vector2f(5.f,5.f), sf::Color(98,168,24));
-  Nutrient nut = Nutrient(shape, id);
+  Nutrient nut = Nutrient(shape, id,energy);
+  
   nutrients.push_back(std::make_unique<Nutrient>(nut));
   return shape != nullptr;
 }
-void Game::removeNutrient(Nutrient nutrient){}
+void Game::removeNutrient(unsigned int id){
+  auto it = nutrients.begin();
+  for (; it != nutrients.end(); it++) {
+    if ((*it)->getId() == id) {
+      break;
+    }
+  }
+
+  if (it != nutrients.end()) {
+    viz.removeObject((*it)->getShape());
+    nutrients.erase(it);
+  }
+}
 
 bool Game::isRunning() { return viz.getWindowIsOpen(); }
 
@@ -81,7 +117,7 @@ void Game::initEntities() {
     return false;
   };
 
-  for (size_t i = 0; i < 1000; i++) {
+  for (size_t i = 0; i < 200; i++) {
     float x, y;
     sf::Vector2f pos;
     do {
@@ -89,12 +125,19 @@ void Game::initEntities() {
       y = dis(gen);
       pos = sf::Vector2f(x, y);
     } while (isInsideObstacle(pos, sf::Vector2f(10.f, 10.f)));
-
-    addEntity(pos, sf::Vector2f(10.f, 10.f), sf::Color::Black);
-    if (i % 20 == 0) {
-      entities[i]->setChase(true);
-      entities[i]->getShape()->setSize(sf::Vector2f(20.f, 20.f));
+    sf::Color randColor(
+      static_cast<sf::Uint8>(static_cast<int>(dis(gen)) % 256),
+      static_cast<sf::Uint8>(static_cast<int>(dis(gen)) % 256),
+      static_cast<sf::Uint8>(static_cast<int>(dis(gen)) % 256)
+    );
+    std::string randomString;
+    for (int i = 0; i < 4; ++i) {
+      randomString += 'A' + static_cast<char>(static_cast<int>(dis(gen)) % 26);
     }
+    addEntity(pos, sf::Vector2f(10.f, 10.f), randColor,randomString);
+    //if (i % 99 == 0) {
+    // entities[i]->getShape()->setSize(sf::Vector2f(20.f, 20.f));
+    //}
   }
 }
 
@@ -139,6 +182,25 @@ void Game::updateEntities() {
       entity->Update();
     }
   }
+  // Remove entities marked for removal
+  entities.erase(std::remove_if(entities.begin(), entities.end(), [&](const std::unique_ptr<Entity>& entity) {
+    if (entity && entity->toBeRemoved) {
+      viz.removeObject(entity->getShape());
+      return true;
+    }
+    return false;
+  }), entities.end());
   // Then, remove deleted (nullptr) entities
   entities.erase(std::remove(entities.begin(), entities.end(), nullptr), entities.end());
+}
+void Game::spawnNutrient() {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<> dis(0, 800);
+
+  sf::Vector2f pos(dis(gen), dis(gen));
+  
+  unsigned int energy = static_cast<unsigned int>(dis(gen)) % 1000 + 500; // Random energy between 50 and 149
+
+  addNutrient(pos, getNutrients().size(), energy);
 }

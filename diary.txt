@@ -1,0 +1,2 @@
+ - 4.6
+   fixed undefined behavior when chasing nutrients -- the entities would sometimes just stop to stare at them.

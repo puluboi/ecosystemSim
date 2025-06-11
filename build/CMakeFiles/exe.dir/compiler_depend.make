@@ -343,7 +343,6 @@ CMakeFiles/exe.dir/src/entity.cpp.o: ../src/entity.cpp \
   /usr/include/c++/11/iostream \
   /usr/include/c++/11/istream \
   /usr/include/c++/11/bits/istream.tcc \
-  ../src/game.hpp \
   /usr/include/c++/11/random \
   /usr/include/c++/11/bits/random.h \
   /usr/include/x86_64-linux-gnu/c++/11/bits/opt_random.h \
@@ -351,6 +350,7 @@ CMakeFiles/exe.dir/src/entity.cpp.o: ../src/entity.cpp \
   /usr/include/c++/11/numeric \
   /usr/include/c++/11/bits/stl_numeric.h \
   /usr/include/c++/11/pstl/glue_numeric_defs.h \
+  ../src/game.hpp \
   ../src/graphics/Viz.hpp \
   /usr/include/memory.h \
   /usr/include/string.h \
