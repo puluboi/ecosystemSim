@@ -176,8 +176,9 @@ void Entity::Update() {
     }
     return;
   }
-  if (checkIfIdle() | collisionCheck()) {  // if idle, get a random destination.
+  if (checkIfIdle() || collisionCheck()) {  // if idle, get a random destination.
     getRandomPos(wanderRange);
+
   }
 
   handleEntities();   // Handle interractions with other entities
@@ -276,6 +277,7 @@ void Entity::handleEntities() {
 
           if (entity->getDamaged(damage)) {  // returns true if is killed
             energy += entity->getEnergy() * efficiency;
+            health = std::min((float)baseHealth, health + entity->baseHealth*efficiency*0.5f);
             if (energy > maxEnergy * 0.5) {
               currentBehavior = DOWN_BAD;
             }

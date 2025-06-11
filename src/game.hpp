@@ -16,7 +16,9 @@ class Game {
   void removeEntity(std::string);
   void spawnEntity(const std::unique_ptr<Entity>& parent1,
                    const std::unique_ptr<Entity>& parent2);
-  bool addEntity(sf::Vector2f pos, sf::Vector2f size, sf::Color color, std::string id);
+  std::string idGen(std::string id1, std::string id2);
+  bool addEntity(sf::Vector2f pos, sf::Vector2f size, sf::Color color,
+                 std::string id);
   bool addNutrient(sf::Vector2f pos, unsigned int id, unsigned int energy);
   
   void removeNutrient(unsigned int id);

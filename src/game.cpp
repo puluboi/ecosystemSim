@@ -56,10 +56,20 @@ void Game::spawnEntity(const std::unique_ptr<Entity>& parent1, const std::unique
   
   auto shape = viz.addObject(parent1->getPos(),parent2->getSize() , color);
   Entity ent = Entity(shape, *this,
-                      parent1->getId());  // Pass the shared_ptr directly
+                      idGen(parent1->getId(), parent2->getId()));  // Pass the shared_ptr directly
 
   ent.setEnergy(4000);
   entities.push_back(std::make_unique<Entity>(ent));
+}
+std::string Game::idGen(std::string id1, std::string id2) {
+  if (id1.size() < 2 || id2.size() < 2) {
+    throw std::invalid_argument("IDs must have at least 2 characters.");
+  }
+
+  int sum1 = static_cast<int>(id1[id1.size() - 2]) + static_cast<int>(id1[id1.size() - 1]);
+  int sum2 = static_cast<int>(id2[id2.size() - 2]) + static_cast<int>(id2[id2.size() - 1]);
+  
+  return std::to_string(sum1 + sum2);
 }
 bool Game::addEntity(sf::Vector2f pos, sf::Vector2f size, sf::Color color, std::string id) {
   std::cout<<id<<std::endl;
@@ -121,7 +131,7 @@ void Game::initEntities() {
     return false;
   };
 
-  for (size_t i = 0; i < 50; i++) {
+  for (size_t i = 0; i < 140; i++) {
     float x, y;
     sf::Vector2f pos;
     do {
